@@ -1,4 +1,4 @@
-#ifndef CONST_DEF_H
+﻿#ifndef CONST_DEF_H
 #define CONST_DEF_H
 
 #include <QObject>
