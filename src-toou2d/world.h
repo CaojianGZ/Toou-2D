@@ -1,4 +1,4 @@
-#ifndef T2DWORLD_H
+﻿#ifndef T2DWORLD_H
 #define T2DWORLD_H
 
 #include <QObject>

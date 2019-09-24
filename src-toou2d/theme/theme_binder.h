@@ -1,4 +1,4 @@
-#ifndef THEME_BINDER_H
+﻿#ifndef THEME_BINDER_H
 #define THEME_BINDER_H
 #include <QDebug>
 #include <QObject>
