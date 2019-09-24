@@ -1,28 +1,23 @@
-OUTP = $$OUT_PWD/../bin/
-DESTDIR += $$OUTP
+OUTP = $$OUT_PWD/../bin/Toou2D
+BUILDBIN_PATH = $$replace(OUTP, src-toou2d/../bin, bin)
+QTQMLT2D_PATH = $$[QT_INSTALL_QML]/Toou2D
+PRESET_PATH = $$PWD/build-preset
+SOLIBFILE_PATH = $$OUT_PWD/libToou2D.so
+ANDROID = NO
 
-COPY_FILELIST += COPY:: $$PWD/build-preset/qmldir TODIR:: \
-                 COPY:: $$PWD/build-preset/plugin.qmltypes TODIR:: \
-                 COPY:: $$PWD/Toou2D.h TODIREND::
+android{
+    ANDROID=YES
+    QMAKE_PRE_LINK *= md $$replace(OUTP, /, \\)
+}else{
+    DESTDIR += $$OUTP
+}
 
-OUTP = $$replace(OUTP, /, \\)
+SHAREDSCRIPT = "$$PWD\win_install.bat" SHARED "$$PWD" "$$PRESET_PATH" "$$BUILDBIN_PATH" "$$QTQMLT2D_PATH" $$ANDROID "$$SOLIBFILE_PATH"
+STATICSCRIPT = "$$PWD\win_install.bat" STATIC "$$PWD" "$$PRESET_PATH" "$$BUILDBIN_PATH" "$$QTQMLT2D_PATH" $$ANDROID "$$SOLIBFILE_PATH"
 
-COPY_FILELIST = $$replace(COPY_FILELIST, /, \\)
-COPY_FILELIST = $$replace(COPY_FILELIST, COPY::, copy /y)
-COPY_FILELIST = $$replace(COPY_FILELIST, TODIR::, $$OUTP && )
-COPY_FILELIST = $$replace(COPY_FILELIST, TODIREND::, $$OUTP)
-
-QMAKE_POST_LINK += $$COPY_FILELIST
-
-CONFIG(install){
-    CONFIG -= staticlib
-
-    INST_QMLPATH_WIN32 = $$[QT_INSTALL_QML]\Toou2D
-    INST_QMLPATH_WIN32 = $$replace(INST_QMLPATH_WIN32, /, \\)
-
-    !exists($$INST_QMLPATH_WIN32){
-        QMAKE_PRE_LINK += md $$INST_QMLPATH_WIN32
-    }
-
-    QMAKE_POST_LINK += && copy /y $$OUTP*.* $$INST_QMLPATH_WIN32
+CONFIG(sharedlib){
+    QMAKE_POST_LINK *= $$replace(SHAREDSCRIPT, /, \\)
+}
+else{
+    QMAKE_POST_LINK *= $$replace(STATICSCRIPT, /, \\)
 }

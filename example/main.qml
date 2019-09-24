@@ -1,62 +1,79 @@
 import QtQuick 2.6
-import QtQuick.Window 2.3
-import QtQuick.Layouts 1.3
-import QtGraphicalEffects 1.0
-import QtQuick.Controls 2.2
+import QtQuick.Window 2.2
 import Toou2D 1.0
-import "./qml"
-Window {
-    id:root
-    visible: true
-    width: 420
-    height: 640
-    title: "Beautiful new world - Toou2D  " + T2D.version();
 
+Window {
+    id:rootwindow
+    visible: true
+    width: 480
+    height: 700
 
     /***
-      * T2DWorld是T2D框架中最重要的配置，
-      * 虽然他现在的接口非常的少，但是没有它T2D将无法正常工作。
+      * T2DWorld是T2D框架中最重要的配置
       ***/
     T2DWorld{
-        globalTheme: "default";
-        importThemePath: "qrc:/net.toou.2d/resource/";
+        mouseAreaCursorShape: Qt.PointingHandCursor
+        appStartupTheme: "Dark"
+        appThemePaths: [
+            "qrc:/themes/"
+        ]
     }
 
-    Item{
-        id:content;
+    TRectangle{
         width: parent.width;
         height: parent.height;
-        x:menubar.isopen ? 80 : 0;
-
-        property string currentLabel: "Home";
-        property string currentUrl: "qrc:/qml/Home.qml";
-
+        color: "#FFF"
+        x:menu.isopen ? 90 : 0;
         Topbar{
             id:topbar;
             width: parent.width;
             height: 45;
-            title: content.currentLabel;
-            onShowMenubar:menubar.isopen = true;
+            onShowMenu: menu.open();
         }
 
-        Loader{
-            id:page;
-            width: parent.width;
-            anchors.top:topbar.bottom;
-            anchors.bottom: bottombar.top;
-            source: content.currentUrl;
 
-            Connections{
-                target: page.item
-                ignoreUnknownSignals:true;
-                onBegin:menubar.isopen = true;
+        Loader{
+            id:pageloader;
+
+            anchors{
+                left:  parent.left;
+                right: parent.right;
+                top:   topbar.bottom;
+                bottom: footerbar.top;
+            }
+            source: "qrc:/Home.qml"
+
+
+            function begin(){
+                menu.open();
+            }
+
+            function toPage(uri,title){
+                source = uri;
+                topbar.title = title;
+            }
+
+        }
+
+        Menubar{
+            id:menu
+            width: 160;
+            height: rootwindow.height;
+            onTopage: {
+                if(title === "Github" || title === "Api docs"){
+                    openurl_dialog.url = uri;
+                    openurl_dialog.open();
+                }else{
+                    pageloader.toPage(uri,title);
+                }
             }
         }
 
-        Bottombar{
-            id:bottombar
+        Footerbar{
+            id:footerbar
             width: parent.width;
             height: 45;
+            anchors.bottom: parent.bottom;
         }
 
         Behavior on x {
@@ -64,23 +81,20 @@ Window {
                 duration: 100
             }
         }
+
     }
 
-    MouseArea{
-        anchors.fill: parent;
-        enabled: menubar.isopen
-        onClicked: {
-            menubar.isopen = !menubar.isopen;
-        }
+    Component.onCompleted: {
+        TToast.layoutY = 20;
     }
 
-    Menubar{
-        id:menubar;
-        width: 160;
-        height: parent.height;
-        onTrigger: {
-            content.currentLabel = label;
-            content.currentUrl = url;
+    TDialog{
+        id:openurl_dialog
+        titleText: "是否打开Url连接";
+        contentText: "前往查看更多详细的内容";
+        property string url;
+        onTriggered: {
+            Qt.openUrlExternally(url);
         }
     }
 
